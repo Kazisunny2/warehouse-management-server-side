@@ -23,6 +23,8 @@ async function run() {
     const inventoryCollection = client
       .db("warehouseInvent")
       .collection("inventory");
+
+    //get api
     app.get("/inventory", async (req, res) => {
       const query = {};
       const cursor = inventoryCollection.find(query);
@@ -35,6 +37,30 @@ async function run() {
       const query = { _id: ObjectId(id) };
       const inventory = await inventoryCollection.findOne(query);
       res.send(inventory);
+    });
+
+    //update
+    app.put("/inventory/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedInventory = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          name: updatedInventory.name,
+          price: updatedInventory.price,
+          description: updatedInventory.description,
+          quantity: updatedInventory.quantity,
+          supplier: updatedInventory.supplier,
+          photourl: updatedInventory.photourl,
+        },
+      };
+      const result = await inventoryCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
+      res.send(result);
     });
 
     //POST
