@@ -23,7 +23,6 @@ async function run() {
     const inventoryCollection = client
       .db("warehouseInvent")
       .collection("inventory");
-
     //get api
     app.get("/inventory", async (req, res) => {
       const query = {};
@@ -75,6 +74,21 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await inventoryCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    //myItem
+    app.get("/myitem", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const cursor = inventoryCollection.find(query);
+      const items = await cursor.toArray();
+      res.send(items);
+    });
+
+    app.post("/myitem", async (req, res) => {
+      const item = req.body;
+      const result = await inventoryCollection.insertOne(item);
       res.send(result);
     });
   } finally {
